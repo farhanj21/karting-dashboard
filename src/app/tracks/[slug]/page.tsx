@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Trophy, Users, Clock, TrendingUp, ChevronLeft, Filter } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import SearchBar from '@/components/SearchBar';
@@ -130,6 +131,16 @@ export default function TrackLeaderboardPage() {
             >
               <ChevronLeft className="w-6 h-6" />
             </Link>
+            {track.logo && (
+              <div className="relative w-12 h-12 rounded-lg overflow-hidden">
+                <Image
+                  src={track.logo}
+                  alt={`${track.name} logo`}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            )}
             <div className="flex-1">
               <h1 className="text-2xl font-display font-bold text-white">
                 {track.name}

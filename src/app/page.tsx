@@ -1,26 +1,29 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Trophy, Users, Clock, TrendingUp } from 'lucide-react';
+import { Track } from '@/types';
 
-export default function HomePage() {
-  // Mock data - will be replaced with real data from API
-  const tracks = [
-    {
-      slug: 'sportzilla-formula-karting',
-      name: 'Sportzilla Formula Karting',
-      location: 'Lahore, Pakistan',
-      totalDrivers: 3590,
-      worldRecord: '01:01.518',
-      recordHolder: 'Ammar Hassan',
-    },
-    {
-      slug: 'apex-autodrome',
-      name: 'Apex Autodrome',
-      location: 'Lahore, Pakistan',
-      totalDrivers: 1783,
-      worldRecord: '00:25.026',
-      recordHolder: 'Ahmad Waleed',
-    },
-  ];
+async function getTracks(): Promise<Track[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/tracks`, {
+      cache: 'no-store', // Always get fresh data
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch tracks');
+    }
+
+    const data = await response.json();
+    return data.tracks || [];
+  } catch (error) {
+    console.error('Error fetching tracks:', error);
+    return [];
+  }
+}
+
+export default async function HomePage() {
+  const tracks = await getTracks();
 
   return (
     <div className="min-h-screen">
@@ -38,7 +41,7 @@ export default function HomePage() {
               <div className="text-right">
                 <div className="text-sm text-gray-400">Total Drivers</div>
                 <div className="text-2xl font-bold text-accent">
-                  {(tracks[0].totalDrivers + tracks[1].totalDrivers).toLocaleString()}
+                  {tracks.reduce((sum, track) => sum + (track.stats?.totalDrivers || 0), 0).toLocaleString()}
                 </div>
               </div>
             </div>
@@ -93,7 +96,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Track Selection */}
+                {/* Track Selection */}
         <div>
           <h3 className="text-3xl font-display font-bold text-white mb-8 text-center">
             Select a Track
@@ -112,19 +115,30 @@ export default function HomePage() {
                     </h4>
                     <p className="text-gray-400">{track.location}</p>
                   </div>
-                  <Trophy className="w-8 h-8 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
+                  {track.logo ? (
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden group-hover:scale-110 transition-transform">
+                      <Image
+                        src={track.logo}
+                        alt={`${track.name} logo`}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <Trophy className="w-8 h-8 text-primary opacity-50 group-hover:opacity-100 transition-opacity" />
+                  )}
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <div className="text-sm text-gray-400 mb-1">World Record</div>
-                    <div className="text-xl font-bold text-accent">{track.worldRecord}</div>
-                    <div className="text-xs text-gray-500 mt-1">{track.recordHolder}</div>
+                    <div className="text-xl font-bold text-accent">{track.stats?.worldRecordStr || 'N/A'}</div>
+                    <div className="text-xs text-gray-500 mt-1">{track.stats?.recordHolder || 'Unknown'}</div>
                   </div>
 
                   <div>
                     <div className="text-sm text-gray-400 mb-1">Total Drivers</div>
-                    <div className="text-xl font-bold text-white">{track.totalDrivers.toLocaleString()}</div>
+                    <div className="text-xl font-bold text-white">{(track.stats?.totalDrivers || 0).toLocaleString()}</div>
                   </div>
 
                   <div className="flex items-end justify-end">
@@ -139,14 +153,13 @@ export default function HomePage() {
         </div>
       </section>
 
+        
+
       {/* Footer */}
       <footer className="border-t border-surface mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-400 text-sm">
-            <p>Data sourced from RaceFacer • Updated every 6 hours</p>
-            <p className="mt-2">
-              Built with Next.js and MongoDB • Racing theme by Karting Analysis
-            </p>
+            <p>Data sourced from RaceFacer • Updated every day at 2PM PKT</p>
           </div>
         </div>
       </footer>

@@ -4,6 +4,7 @@ export interface Track {
   slug: string;
   location: string;
   description?: string;
+  logo?: string;
   stats: TrackStats;
   createdAt: string;
   updatedAt: string;

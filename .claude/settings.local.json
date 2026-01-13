@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(cmdkey /list:*)",
+      "Bash(findstr:*)",
+      "Bash(git credential-manager:*)",
+      "Bash(printf:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(dir \"C:\\\\Users\\\\f-jaf\\\\Desktop\\\\Code\\\\karting-dashboard\\\\public\" /b)"
     ]
   }
 }
