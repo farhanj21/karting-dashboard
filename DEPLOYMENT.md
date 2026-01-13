@@ -76,9 +76,6 @@ cp .env.example .env
 
 Edit `.env` and add your connection string:
 
-```env
-MONGODB_URI=mongodb+srv://karting-admin:YOUR_PASSWORD@cluster.mongodb.net/karting-analysis
-```
 
 ### 3. Run Initial Sync
 
