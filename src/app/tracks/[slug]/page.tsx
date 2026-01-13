@@ -156,6 +156,12 @@ export default function TrackLeaderboardPage() {
               </h1>
               <p className="text-sm text-gray-400">{track.location}</p>
             </div>
+            <Link
+              href={`/tracks/${slug}/about`}
+              className="px-4 py-2 bg-surfaceHover text-white rounded hover:bg-surface transition-colors text-sm font-medium"
+            >
+              About Track
+            </Link>
           </div>
         </div>
       </header>

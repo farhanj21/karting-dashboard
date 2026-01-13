@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
-import Track from '@/lib/models/Track';
+import Track, { ITrack } from '@/lib/models/Track';
 import LapRecord from '@/lib/models/LapRecord';
 
 export async function GET(
@@ -10,7 +10,7 @@ export async function GET(
   try {
     await connectDB();
 
-    const track = await Track.findOne({ slug: params.slug }).lean();
+    const track = await Track.findOne({ slug: params.slug }).lean() as any;
 
     if (!track) {
       return NextResponse.json(
@@ -23,7 +23,7 @@ export async function GET(
     }
 
     // Calculate mean if not present
-    if (!track.stats.mean) {
+    if (!track.stats?.mean) {
       const result = await LapRecord.aggregate([
         { $match: { trackSlug: params.slug } },
         {

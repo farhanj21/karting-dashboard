@@ -27,6 +27,24 @@ export interface ITrack {
     };
     lastUpdated: Date;
   };
+  about?: {
+    layoutImage?: string;
+    description?: string;
+    details?: {
+      length?: string;
+      width?: string;
+      corners?: number;
+      surface?: string;
+      lapRecord?: string;
+      kartType?: string;
+    };
+    videos?: string[];
+    mapLocation?: {
+      lat: number;
+      lng: number;
+      embedUrl?: string;
+    };
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,6 +75,24 @@ const TrackSchema = new Schema<ITrack>(
         driverCount: { type: Number },
       },
       lastUpdated: { type: Date, default: Date.now },
+    },
+    about: {
+      layoutImage: { type: String },
+      description: { type: String },
+      details: {
+        length: { type: String },
+        width: { type: String },
+        corners: { type: Number },
+        surface: { type: String },
+        lapRecord: { type: String },
+        kartType: { type: String },
+      },
+      videos: [{ type: String }],
+      mapLocation: {
+        lat: { type: Number },
+        lng: { type: Number },
+        embedUrl: { type: String },
+      },
     },
   },
   {

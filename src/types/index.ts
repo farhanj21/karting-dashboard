@@ -6,6 +6,24 @@ export interface Track {
   description?: string;
   logo?: string;
   stats: TrackStats;
+  about?: {
+    layoutImage?: string;
+    description?: string;
+    details?: {
+      length?: string;
+      width?: string;
+      corners?: number;
+      surface?: string;
+      lapRecord?: string;
+      kartType?: string;
+    };
+    videos?: string[];
+    mapLocation?: {
+      lat: number;
+      lng: number;
+      embedUrl?: string;
+    };
+  };
   createdAt: string;
   updatedAt: string;
 }
