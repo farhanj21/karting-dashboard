@@ -44,12 +44,6 @@ Create a `.env.local` file in the root directory:
 cp .env.example .env.local
 ```
 
-Edit `.env.local` and add your MongoDB connection string:
-
-```env
-MONGODB_URI=mongodb+srv://your-username:your-password@your-cluster.mongodb.net/karting-analysis?retryWrites=true&w=majority
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
 
 ### 3. Ensure Data is Synced
 
