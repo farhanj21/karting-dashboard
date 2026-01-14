@@ -24,17 +24,6 @@ export default function KartTypeSelector({
         <Car className="w-4 h-4" />
         <span>Kart Type:</span>
       </div>
-      <button
-        type="button"
-        onClick={() => onKartTypeChange('')}
-        className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-          selectedKartType === ''
-            ? 'bg-primary text-white'
-            : 'bg-surfaceHover text-gray-400 hover:bg-surface'
-        }`}
-      >
-        All Karts
-      </button>
       {kartTypes.map((type) => (
         <button
           type="button"

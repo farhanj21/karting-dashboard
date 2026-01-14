@@ -39,6 +39,10 @@ export default function TrackLeaderboardPage() {
         const data = await response.json();
         if (data.success) {
           setTrack(data.track);
+          // Set default kart type to the first available kart type
+          if (data.track.kartTypes && data.track.kartTypes.length > 0) {
+            setSelectedKartType(data.track.kartTypes[0]);
+          }
         }
       } catch (error) {
         console.error('Error fetching track:', error);
@@ -277,7 +281,7 @@ export default function TrackLeaderboardPage() {
           </h2>
 
           {/* Podium - Only show on first page without filters */}
-          {!loading && records.length >= 3 && page === 1 && !searchQuery && !selectedTier && !selectedKartType && (
+          {!loading && records.length >= 3 && page === 1 && !searchQuery && !selectedTier && (
             <div className="bg-gradient-to-b from-surface to-background border border-surfaceHover rounded-xl p-8 mb-6">
               <div className="flex items-center justify-center gap-4 max-w-4xl mx-auto">
                 {/* 2nd Place */}
@@ -346,10 +350,9 @@ export default function TrackLeaderboardPage() {
           {/* Rest of Leaderboard Table */}
           <div className="bg-surface border border-surfaceHover rounded-lg p-6">
             <LeaderboardTable
-              records={page === 1 && !searchQuery && !selectedTier && !selectedKartType ? records.slice(3) : records}
+              records={page === 1 && !searchQuery && !selectedTier ? records.slice(3) : records}
               loading={loading}
-              startPosition={page === 1 && !searchQuery && !selectedTier && !selectedKartType ? 4 : (page - 1) * rowsPerPage + 1}
-              showKartType={!!selectedKartType || (track.kartTypes && track.kartTypes.length > 1)}
+              showKartType={track.kartTypes && track.kartTypes.length > 1}
             />
 
             {/* Pagination */}

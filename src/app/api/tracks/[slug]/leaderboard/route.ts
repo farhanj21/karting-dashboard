@@ -32,20 +32,22 @@ export async function GET(
       query.kartType = kartType;
     }
 
-    // Build sort
+    // Build sort - use bestTime when filtering to ensure correct order
     let sortQuery: any = {};
+    const hasFilters = kartType || tier || search;
+
     switch (sort) {
       case 'position':
-        sortQuery = { position: 1 };
+        sortQuery = hasFilters ? { bestTime: 1 } : { position: 1 };
         break;
       case 'time':
         sortQuery = { bestTime: 1 };
         break;
       case 'tier':
-        sortQuery = { tier: 1, position: 1 };
+        sortQuery = hasFilters ? { tier: 1, bestTime: 1 } : { tier: 1, position: 1 };
         break;
       default:
-        sortQuery = { position: 1 };
+        sortQuery = hasFilters ? { bestTime: 1 } : { position: 1 };
     }
 
     // Calculate skip
@@ -62,6 +64,47 @@ export async function GET(
     ]);
 
     const totalPages = Math.ceil(total / limit);
+
+    // If filtering by kartType, tier, or search, recalculate positions, gaps, and intervals
+    if (kartType || tier || search) {
+      // Get the first record (P1) for gap calculation
+      const p1Record = await LapRecord.findOne(query)
+        .sort({ bestTime: 1 })
+        .lean();
+
+      if (p1Record) {
+        const p1Time = p1Record.bestTime;
+
+        // Recalculate positions, gaps, and intervals
+        for (let i = 0; i < records.length; i++) {
+          const record = records[i];
+
+          // Recalculate position (skip + i + 1)
+          record.position = skip + i + 1;
+
+          // Recalculate gap to P1
+          record.gapToP1 = record.bestTime - p1Time;
+
+          // Recalculate interval
+          if (i === 0 && skip === 0) {
+            // First record overall
+            record.interval = 0;
+          } else if (i === 0 && skip > 0) {
+            // First record on this page but not overall - need previous record
+            const prevRecord = await LapRecord.findOne(query)
+              .sort({ bestTime: 1 })
+              .skip(skip - 1)
+              .limit(1)
+              .lean();
+
+            record.interval = prevRecord ? record.bestTime - prevRecord.bestTime : 0;
+          } else {
+            // Calculate interval from previous record in the list
+            record.interval = record.bestTime - records[i - 1].bestTime;
+          }
+        }
+      }
+    }
 
     return NextResponse.json({
       success: true,
