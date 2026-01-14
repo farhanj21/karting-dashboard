@@ -4,12 +4,55 @@ import { Users, Clock, TrendingUp } from 'lucide-react';
 import { Track } from '@/types';
 import connectDB from '@/lib/mongodb';
 import TrackModel from '@/lib/models/Track';
+import LapRecord from '@/lib/models/LapRecord';
 
-async function getTracks(): Promise<Track[]> {
+interface TrackWithKartRecords extends Track {
+  kartRecords?: Array<{
+    kartType: string;
+    worldRecord: string;
+    recordHolder: string;
+  }>;
+}
+
+async function getTracks(): Promise<TrackWithKartRecords[]> {
   try {
     await connectDB();
     const tracks = await TrackModel.find({}).sort({ 'stats.totalDrivers': -1 }).lean();
-    return JSON.parse(JSON.stringify(tracks));
+
+    // For each track, get the world record for each kart type
+    const tracksWithKartRecords = await Promise.all(
+      tracks.map(async (track) => {
+        if (track.kartTypes && track.kartTypes.length > 1) {
+          // Fetch world record for each kart type
+          const kartRecords = await Promise.all(
+            track.kartTypes.map(async (kartType: string) => {
+              const record: any = await LapRecord.findOne({
+                trackSlug: track.slug,
+                kartType: kartType,
+              })
+                .sort({ bestTime: 1 })
+                .limit(1)
+                .lean();
+
+              return {
+                kartType,
+                worldRecord: record?.bestTimeStr || 'N/A',
+                recordHolder: record?.driverName || 'Unknown',
+              };
+            })
+          );
+
+          return {
+            ...track,
+            kartRecords,
+          };
+        }
+
+        return track;
+      })
+    );
+
+    return JSON.parse(JSON.stringify(tracksWithKartRecords));
   } catch (error) {
     console.error('Error fetching tracks:', error);
     return [];
@@ -117,36 +160,62 @@ export default async function HomePage() {
                     </h4>
                     <p className="text-gray-400">{track.location}</p>
                   </div>
-                  {track.logo && (
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden group-hover:scale-110 transition-transform">
-                      <Image
-                        src={track.logo}
-                        alt={`${track.name} logo`}
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <div className="text-sm text-gray-400 mb-1">World Record</div>
-                    <div className="text-xl font-bold text-accent">{track.stats?.worldRecordStr || 'N/A'}</div>
-                    <div className="text-xs text-gray-500 mt-1">{track.stats?.recordHolder || 'Unknown'}</div>
-                  </div>
-
-                  <div>
-                    <div className="text-sm text-gray-400 mb-1">Total Drivers</div>
-                    <div className="text-xl font-bold text-white">{(track.stats?.totalDrivers || 0).toLocaleString()}</div>
-                  </div>
-
-                  <div className="flex items-end justify-end">
-                    <div className="text-primary group-hover:translate-x-2 transition-transform">
-                      View Leaderboard →
-                    </div>
+                  <div className="relative w-16 h-16 rounded-lg overflow-hidden group-hover:scale-110 transition-transform">
+                    <Image
+                      src={`/tracks/${track.slug}.png`}
+                      alt={`${track.name} logo`}
+                      fill
+                      className="object-contain"
+                    />
                   </div>
                 </div>
+
+                {track.kartRecords && track.kartRecords.length > 0 ? (
+                  <div className="space-y-4">
+                    <div className="text-sm text-gray-400 mb-2">Track Records by Kart Type:</div>
+                    <div className="grid grid-cols-1 gap-3">
+                      {track.kartRecords.map((kartRecord) => (
+                        <div key={kartRecord.kartType} className="bg-background/50 rounded-lg p-3 border border-surfaceHover">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">{kartRecord.kartType}</div>
+                              <div className="text-lg font-bold text-accent">{kartRecord.worldRecord}</div>
+                              <div className="text-xs text-gray-500 mt-1">{kartRecord.recordHolder}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-surfaceHover">
+                      <div>
+                        <div className="text-sm text-gray-400 mb-1">Total Drivers</div>
+                        <div className="text-xl font-bold text-white">{(track.stats?.totalDrivers || 0).toLocaleString()}</div>
+                      </div>
+                      <div className="text-primary group-hover:translate-x-2 transition-transform">
+                        View Leaderboard →
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-400 mb-1">World Record</div>
+                      <div className="text-xl font-bold text-accent">{track.stats?.worldRecordStr || 'N/A'}</div>
+                      <div className="text-xs text-gray-500 mt-1">{track.stats?.recordHolder || 'Unknown'}</div>
+                    </div>
+
+                    <div>
+                      <div className="text-sm text-gray-400 mb-1">Total Drivers</div>
+                      <div className="text-xl font-bold text-white">{(track.stats?.totalDrivers || 0).toLocaleString()}</div>
+                    </div>
+
+                    <div className="flex items-end justify-end">
+                      <div className="text-primary group-hover:translate-x-2 transition-transform">
+                        View Leaderboard →
+                      </div>
+                    </div>
+                  </div>
+                )}
               </Link>
             ))}
           </div>

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, MapPin, Video, Info, Ruler, Flag } from 'lucide-react';
+import { ChevronLeft, MapPin, Video, Info, Ruler, Flag, Trophy } from 'lucide-react';
 import { Track } from '@/types';
 
 // Static track data
@@ -12,9 +12,9 @@ const TRACK_DATA: Record<string, any> = {
   'sportzilla-formula-karting': {
     name: 'Sportzilla Formula Karting Club',
     location: 'Bedian Road, Lahore, Pakistan',
-    logo: '/logos/sportzilla.png',
+    logo: '/tracks/sportzilla-formula-karting.png',
     about: {
-      layoutImage: 'https://via.placeholder.com/1200x600?text=Sportzilla+Track+Layout',
+      layoutImage: '/tracks/sportzilla-layout.png',
       description: 'Sportzilla Formula Karting is one of Lahore\'s premier karting venues, featuring a challenging outdoor circuit designed for competitive racing. The track offers an exciting mix of high-speed straights and technical corners, providing the perfect environment for both beginners and experienced racers.',
       details: {
         length: '800m',
@@ -37,9 +37,9 @@ const TRACK_DATA: Record<string, any> = {
   'apex-autodrome': {
     name: 'Apex Autodrome',
     location: 'Lahore, Pakistan',
-    logo: '/logos/apex.png',
+    logo: '/tracks/apex-autodrome.png',
     about: {
-      layoutImage: 'https://via.placeholder.com/1200x600?text=Apex+Autodrome+Track+Layout',
+      layoutImage: '/tracks/apex-layout.png',
       description: 'Pakistan’s premier indoor Go-Karting & immersive Gaming Arcade. For the first time, we bring together the adrenaline-pumping thrill of the most advanced and high-speed Italian karts - Apex Autodrome strikes the perfect balance between speed and control.',
       details: {
         length: '500m',
@@ -67,6 +67,11 @@ export default function AboutTrackPage() {
 
   const [track, setTrack] = useState<Track | null>(null);
   const [loading, setLoading] = useState(true);
+  const [kartRecords, setKartRecords] = useState<Array<{
+    kartType: string;
+    worldRecord: string;
+    recordHolder: string;
+  }>>([]);
 
   useEffect(() => {
     async function fetchTrack() {
@@ -90,6 +95,47 @@ export default function AboutTrackPage() {
     }
     fetchTrack();
   }, [slug]);
+
+  // Fetch kart records for tracks with multiple kart types
+  useEffect(() => {
+    async function fetchKartRecords() {
+      if (!track || !track.kartTypes || track.kartTypes.length <= 1) {
+        return;
+      }
+
+      try {
+        const records = await Promise.all(
+          track.kartTypes.map(async (kartType: string) => {
+            const response = await fetch(
+              `/api/tracks/${slug}/leaderboard?kartType=${kartType}&limit=1`
+            );
+            const data = await response.json();
+
+            if (data.success && data.records.length > 0) {
+              const record = data.records[0];
+              return {
+                kartType,
+                worldRecord: record.bestTimeStr,
+                recordHolder: record.driverName,
+              };
+            }
+
+            return {
+              kartType,
+              worldRecord: 'N/A',
+              recordHolder: 'Unknown',
+            };
+          })
+        );
+
+        setKartRecords(records);
+      } catch (error) {
+        console.error('Error fetching kart records:', error);
+      }
+    }
+
+    fetchKartRecords();
+  }, [track, slug]);
 
   if (loading) {
     return (
@@ -124,16 +170,14 @@ export default function AboutTrackPage() {
             >
               <ChevronLeft className="w-6 h-6" />
             </Link>
-            {track.logo && (
-              <div className="relative w-12 h-12 rounded-lg overflow-hidden">
-                <Image
-                  src={track.logo}
-                  alt={`${track.name} logo`}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            )}
+            <div className="relative w-12 h-12 rounded-lg overflow-hidden">
+              <Image
+                src={`/tracks/${slug}.png`}
+                alt={`${track.name} logo`}
+                fill
+                className="object-contain"
+              />
+            </div>
             <div className="flex-1">
               <h1 className="text-2xl font-display font-bold text-white">
                 About {track.name}
@@ -152,7 +196,7 @@ export default function AboutTrackPage() {
               <Flag className="w-5 h-5 text-primary" />
               <h2 className="text-xl font-display font-bold text-white">Track Layout</h2>
             </div>
-            <div className="relative w-full aspect-video bg-background rounded-lg overflow-hidden">
+            <div className="relative w-full max-w-3xl mx-auto aspect-video rounded-lg overflow-hidden">
               <Image
                 src={track.about.layoutImage}
                 alt={`${track.name} track layout`}
@@ -171,6 +215,30 @@ export default function AboutTrackPage() {
               <h2 className="text-xl font-display font-bold text-white">About the Track</h2>
             </div>
             <p className="text-gray-300 leading-relaxed">{track.about.description}</p>
+          </div>
+        )}
+
+        {/* Kart Records - Show for tracks with multiple kart types */}
+        {kartRecords.length > 0 && (
+          <div className="bg-surface border border-surfaceHover rounded-xl p-6 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-display font-bold text-white">Track Records by Kart Type</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {kartRecords.map((record) => (
+                <div
+                  key={record.kartType}
+                  className="bg-background/50 rounded-lg p-4 border border-surfaceHover"
+                >
+                  <div className="text-sm text-gray-400 mb-2">{record.kartType}</div>
+                  <div className="text-2xl font-bold text-accent mb-1">
+                    {record.worldRecord}
+                  </div>
+                  <div className="text-sm text-gray-500">{record.recordHolder}</div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -210,17 +278,6 @@ export default function AboutTrackPage() {
                 <div>
                   <div className="text-sm text-gray-400 mb-1">Kart Type</div>
                   <div className="text-lg font-semibold text-white">{track.about.details.kartType}</div>
-                </div>
-              )}
-              {(track.about.details.lapRecord || track.stats?.worldRecordStr) && (
-                <div>
-                  <div className="text-sm text-gray-400 mb-1">Track Record</div>
-                  <div className="text-lg font-semibold text-accent">
-                    {track.stats?.worldRecordStr || track.about.details.lapRecord}
-                  </div>
-                  {track.stats?.recordHolder && (
-                    <div className="text-xs text-gray-500 mt-1">{track.stats.recordHolder}</div>
-                  )}
                 </div>
               )}
             </div>

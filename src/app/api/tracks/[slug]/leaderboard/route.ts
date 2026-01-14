@@ -68,7 +68,7 @@ export async function GET(
     // If filtering by kartType, tier, or search, recalculate positions, gaps, and intervals
     if (kartType || tier || search) {
       // Get the first record (P1) for gap calculation
-      const p1Record = await LapRecord.findOne(query)
+      const p1Record: any = await LapRecord.findOne(query)
         .sort({ bestTime: 1 })
         .lean();
 
@@ -77,7 +77,7 @@ export async function GET(
 
         // Recalculate positions, gaps, and intervals
         for (let i = 0; i < records.length; i++) {
-          const record = records[i];
+          const record: any = records[i];
 
           // Recalculate position (skip + i + 1)
           record.position = skip + i + 1;
@@ -91,7 +91,7 @@ export async function GET(
             record.interval = 0;
           } else if (i === 0 && skip > 0) {
             // First record on this page but not overall - need previous record
-            const prevRecord = await LapRecord.findOne(query)
+            const prevRecord: any = await LapRecord.findOne(query)
               .sort({ bestTime: 1 })
               .skip(skip - 1)
               .limit(1)
@@ -100,7 +100,8 @@ export async function GET(
             record.interval = prevRecord ? record.bestTime - prevRecord.bestTime : 0;
           } else {
             // Calculate interval from previous record in the list
-            record.interval = record.bestTime - records[i - 1].bestTime;
+            const prevRecord: any = records[i - 1];
+            record.interval = record.bestTime - prevRecord.bestTime;
           }
         }
       }

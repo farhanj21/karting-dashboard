@@ -155,16 +155,14 @@ export default function TrackLeaderboardPage() {
             >
               <ChevronLeft className="w-6 h-6" />
             </Link>
-            {track.logo && (
-              <div className="relative w-12 h-12 rounded-lg overflow-hidden">
-                <Image
-                  src={track.logo}
-                  alt={`${track.name} logo`}
-                  fill
-                  className="object-contain"
-                />
-              </div>
-            )}
+            <div className="relative w-12 h-12 rounded-lg overflow-hidden">
+              <Image
+                src={`/tracks/${slug}.png`}
+                alt={`${track.name} logo`}
+                fill
+                className="object-contain"
+              />
+            </div>
             <div className="flex-1">
               <h1 className="text-2xl font-display font-bold text-white">
                 {track.name}
@@ -217,44 +215,47 @@ export default function TrackLeaderboardPage() {
               <SearchBar onSearch={handleSearch} placeholder="Search drivers..." />
             </div>
 
-            {/* Kart Type Filter */}
-            {track.kartTypes && track.kartTypes.length > 0 && (
-              <KartTypeSelector
-                kartTypes={track.kartTypes}
-                selectedKartType={selectedKartType}
-                onKartTypeChange={handleKartTypeChange}
-              />
-            )}
-
-            {/* Tier Filter */}
-            <div className="flex gap-2 flex-wrap">
-              <div className="text-sm text-gray-400 flex items-center gap-2">
-                <Filter className="w-4 h-4" />
-                <span>Filter by tier:</span>
-              </div>
-              {['S+', 'S', 'A', 'B', 'C', 'D'].map((tier) => (
-                <button
-                  type="button"
-                  key={tier}
-                  onClick={() => handleTierFilter(tier)}
-                  className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-                    selectedTier === tier
-                      ? 'bg-primary text-white'
-                      : 'bg-surfaceHover text-gray-400 hover:bg-surface'
-                  }`}
-                >
-                  {tier}
-                </button>
-              ))}
-              {selectedTier && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedTier('')}
-                  className="px-3 py-1 rounded text-sm text-gray-400 hover:text-white"
-                >
-                  Clear
-                </button>
+            {/* Kart Type and Tier Filters in one row */}
+            <div className="flex gap-4 flex-wrap items-center justify-between">
+              {/* Kart Type Filter */}
+              {track.kartTypes && track.kartTypes.length > 0 && (
+                <KartTypeSelector
+                  kartTypes={track.kartTypes}
+                  selectedKartType={selectedKartType}
+                  onKartTypeChange={handleKartTypeChange}
+                />
               )}
+
+              {/* Tier Filter */}
+              <div className="flex gap-2 flex-wrap items-center ml-auto">
+                <div className="text-sm text-gray-400 flex items-center gap-2">
+                  <Filter className="w-4 h-4" />
+                  <span>Filter by tier:</span>
+                </div>
+                {['S+', 'S', 'A', 'B', 'C', 'D'].map((tier) => (
+                  <button
+                    type="button"
+                    key={tier}
+                    onClick={() => handleTierFilter(tier)}
+                    className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
+                      selectedTier === tier
+                        ? 'bg-primary text-white'
+                        : 'bg-surfaceHover text-gray-400 hover:bg-surface'
+                    }`}
+                  >
+                    {tier}
+                  </button>
+                ))}
+                {selectedTier && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTier('')}
+                    className="px-3 py-1 rounded text-sm text-gray-400 hover:text-white"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -299,7 +300,7 @@ export default function TrackLeaderboardPage() {
                       {records[1].bestTimeStr}
                     </div>
                     <div className="text-xs text-gray-400 mt-2">
-                      +{formatGap(records[1].gapToP1)}
+                      {formatGap(records[1].gapToP1)}
                     </div>
                   </div>
                 </div>
@@ -339,7 +340,7 @@ export default function TrackLeaderboardPage() {
                       {records[2].bestTimeStr}
                     </div>
                     <div className="text-xs text-gray-400 mt-2">
-                      +{formatGap(records[2].gapToP1)}
+                      {formatGap(records[2].gapToP1)}
                     </div>
                   </div>
                 </div>
