@@ -101,6 +101,12 @@ export default async function HomePage() {
               >
                 2F2F Islamabad
               </Link>
+              <Link
+                href="/tracks/omni-karting-circuit"
+                className="text-gray-400 hover:text-primary transition-colors font-medium"
+              >
+                Omni Circuit
+              </Link>
             </nav>
           </div>
         </div>

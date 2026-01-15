@@ -30,6 +30,10 @@ export interface ITrack {
   };
   about?: {
     layoutImage?: string;
+    layoutImages?: Array<{
+      url: string;
+      label: string;
+    }>;
     description?: string;
     details?: {
       length?: string;
@@ -80,6 +84,10 @@ const TrackSchema = new Schema<ITrack>(
     },
     about: {
       layoutImage: { type: String },
+      layoutImages: [{
+        url: { type: String },
+        label: { type: String },
+      }],
       description: { type: String },
       details: {
         length: { type: String },

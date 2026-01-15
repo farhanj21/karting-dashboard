@@ -103,6 +103,31 @@ const TRACK_DATA: Record<string, any> = {
       },
     },
   },
+  'omni-karting-circuit': {
+    name: 'Omni Karting Circuit',
+    location: 'Karachi, Pakistan',
+    logo: '/tracks/omni-karting-circuit.png',
+    about: {
+      layoutImages: [
+        { url: '/tracks/omni-layout-half.jpg', label: 'Half Track Layout' },
+        { url: '/tracks/omni-layout-full.jpg', label: 'Full Track Layout' },
+      ],
+      description: 'Omni Karting Circuit brings competitive karting to Karachi with two kart types: RT8 and RX250. Experience the thrill of racing on Pakistan\'s premier karting circuit in the heart of Karachi.',
+      details: {
+        length: '1.6km',
+        width: '8-12 meters',
+        corners: 19,
+        surface: 'Asphalt Road',
+        kartType: 'RT8, RX250',
+      },
+      videos: ['https://www.youtube.com/embed/rWsvqCVNF2k', 'https://www.youtube.com/embed/WQJ9Em7Ct9I'],
+        mapLocation: {
+            lat: 24.790941089600718,
+            lng: 67.12270614495634,
+            embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3619.8547892156!2d67.12270614495634!3d24.790941089600718!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjTCsDQ3JzI3LjQiTiA2N8KwMDcnMjEuNyJF!5e0!3m2!1sen!2s!4v1234567890!5m2!1sen!2s"
+        }
+    },
+  },
 };
 
 export default function AboutTrackPage() {
@@ -238,8 +263,33 @@ export default function AboutTrackPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Track Layout Image */}
-        {track.about?.layoutImage && (
+        {/* Track Layout Images - Multiple layouts */}
+        {track.about?.layoutImages && track.about.layoutImages.length > 0 && (
+          <div className="bg-surface border border-surfaceHover rounded-xl p-6 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Flag className="w-5 h-5 text-primary" />
+              <h2 className="text-xl font-display font-bold text-white">Track Layouts</h2>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {track.about.layoutImages.map((layout: any, index: number) => (
+                <div key={index} className="space-y-2">
+                  <div className="text-sm text-gray-400 font-medium text-center">{layout.label}</div>
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-background">
+                    <Image
+                      src={layout.url}
+                      alt={`${track.name} - ${layout.label}`}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Track Layout Image - Single layout (backward compatibility) */}
+        {track.about?.layoutImage && !track.about?.layoutImages && (
           <div className="bg-surface border border-surfaceHover rounded-xl p-6 mb-8">
             <div className="flex items-center gap-2 mb-4">
               <Flag className="w-5 h-5 text-primary" />

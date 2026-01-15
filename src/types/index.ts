@@ -9,6 +9,10 @@ export interface Track {
   stats: TrackStats;
   about?: {
     layoutImage?: string;
+    layoutImages?: Array<{
+      url: string;
+      label: string;
+    }>;
     description?: string;
     details?: {
       length?: string;
