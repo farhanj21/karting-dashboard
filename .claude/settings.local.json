@@ -9,7 +9,14 @@
       "Bash(git branch:*)",
       "Bash(git push:*)",
       "Bash(dir \"C:\\\\Users\\\\f-jaf\\\\Desktop\\\\Code\\\\karting-dashboard\\\\public\" /b)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(test:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(python:*)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\f-jaf\\\\Desktop\\\\Code\\\\karting-dashboard\\\\src\\\\app\\\\tracks\")",
+      "mcp__ide__getDiagnostics",
+      "Bash(git show:*)",
+      "Bash(git diff:*)"
     ]
   }
 }

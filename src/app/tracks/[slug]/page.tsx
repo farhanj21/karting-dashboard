@@ -220,7 +220,7 @@ export default function TrackLeaderboardPage() {
               {/* Kart Type Filter */}
               {track.kartTypes && track.kartTypes.length > 0 && (
                 <KartTypeSelector
-                  kartTypes={track.kartTypes}
+                  kartTypes={slug === '2f2f-formula-karting' ? track.kartTypes.filter(kt => kt !== 'LR5') : track.kartTypes}
                   selectedKartType={selectedKartType}
                   onKartTypeChange={handleKartTypeChange}
                 />

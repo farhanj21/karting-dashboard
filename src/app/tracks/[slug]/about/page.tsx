@@ -40,7 +40,7 @@ const TRACK_DATA: Record<string, any> = {
     logo: '/tracks/apex-autodrome.png',
     about: {
       layoutImage: '/tracks/apex-layout.png',
-      description: 'Pakistan’s premier indoor Go-Karting & immersive Gaming Arcade. For the first time, we bring together the adrenaline-pumping thrill of the most advanced and high-speed Italian karts - Apex Autodrome strikes the perfect balance between speed and control.',
+      description: 'Pakistan\'s premier indoor Go-Karting & immersive Gaming Arcade. For the first time, we bring together the adrenaline-pumping thrill of the most advanced and high-speed Italian karts - Apex Autodrome strikes the perfect balance between speed and control.',
       details: {
         length: '500m',
         width: '8-12 meters',
@@ -56,6 +56,28 @@ const TRACK_DATA: Record<string, any> = {
               lat: 31.3588467,
               lng: 74.1830835,
               embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3448.7!2d74.1805032!3d31.3588467!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3918558572063d93%3A0xb70e74c0053298ef!2sApex%20Autodrome!5e0!3m2!1sen!2s!4v1700000000000",
+            },
+    },
+  },
+  '2f2f-formula-karting': {
+    name: '2F2F Formula Karting',
+    location: 'Lahore, Pakistan',
+    logo: '/tracks/2f2f-formula-karting.png',
+    about: {
+      layoutImage: '/tracks/2f2f-layout.png',
+      description: 'Pakistan\'s Largest International Level Go Karting Track Located in Garrison Sports Arena, Adjacent to Askari X in Lahore. This is the Second Track of 2F2F Formula Karting Pakistan, The First Track is in Lake View Park in Islamabad.',
+      details: {
+        length: '1.2km',
+        width: '8-10 meters',
+        corners: 13,
+        surface: 'Asphalt Road',
+        kartType: 'RX8',
+      },
+      videos: ['https://www.youtube.com/embed/VWDUqCEZTQo', 'https://www.youtube.com/embed/Gbod4z8LHQ4'],
+      mapLocation: {
+              lat: 31.540781,
+              lng: 74.4153437,
+              embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1617.0642646972913!2d74.4153437!3d31.540781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39190f1c1e13b4dd%3A0x3640559c8a822e8!2s2F2F%20Formula%20Karting!5e0!3m2!1sen!2s!4v1700000000000",
             },
     },
   },
@@ -104,8 +126,13 @@ export default function AboutTrackPage() {
       }
 
       try {
+        // Filter out LR5 for 2F2F track
+        const kartTypesToShow = slug === '2f2f-formula-karting'
+          ? track.kartTypes.filter(kt => kt !== 'LR5')
+          : track.kartTypes;
+
         const records = await Promise.all(
-          track.kartTypes.map(async (kartType: string) => {
+          kartTypesToShow.map(async (kartType: string) => {
             const response = await fetch(
               `/api/tracks/${slug}/leaderboard?kartType=${kartType}&limit=1`
             );
@@ -250,25 +277,25 @@ export default function AboutTrackPage() {
               <h2 className="text-xl font-display font-bold text-white">Track Specifications</h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {track.about.details.length && (
+              {track.about.details.length && track.about.details.length !== 'TBD' && (
                 <div>
                   <div className="text-sm text-gray-400 mb-1">Track Length</div>
                   <div className="text-lg font-semibold text-white">{track.about.details.length}</div>
                 </div>
               )}
-              {track.about.details.width && (
+              {track.about.details.width && track.about.details.width !== 'TBD' && (
                 <div>
                   <div className="text-sm text-gray-400 mb-1">Track Width</div>
                   <div className="text-lg font-semibold text-white">{track.about.details.width}</div>
                 </div>
               )}
-              {track.about.details.corners && (
+              {track.about.details.corners && track.about.details.corners !== 0 && (
                 <div>
                   <div className="text-sm text-gray-400 mb-1">Number of Corners</div>
                   <div className="text-lg font-semibold text-white">{track.about.details.corners}</div>
                 </div>
               )}
-              {track.about.details.surface && (
+              {track.about.details.surface && track.about.details.surface !== 'TBD' && (
                 <div>
                   <div className="text-sm text-gray-400 mb-1">Surface Type</div>
                   <div className="text-lg font-semibold text-white">{track.about.details.surface}</div>

@@ -89,6 +89,12 @@ export default async function HomePage() {
               >
                 Apex Autodrome
               </Link>
+              <Link
+                href="/tracks/2f2f-formula-karting"
+                className="text-gray-400 hover:text-primary transition-colors font-medium"
+              >
+                2F2F
+              </Link>
             </nav>
           </div>
         </div>
