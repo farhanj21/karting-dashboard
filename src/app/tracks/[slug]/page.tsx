@@ -324,7 +324,7 @@ export default function TrackLeaderboardPage() {
                       {records[0].bestTimeStr}
                     </div>
                     <div className="text-xs text-yellow-200 mt-2 font-semibold">
-                      World Record
+                      Track Record
                     </div>
                   </div>
                 </div>

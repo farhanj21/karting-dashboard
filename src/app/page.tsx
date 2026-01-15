@@ -74,7 +74,7 @@ export default async function HomePage() {
               <h1 className="text-3xl font-display font-bold text-white">
                 <span className="text-primary">Karting</span> Analysis
               </h1>
-              <p className="text-sm text-gray-400 mt-1">Lahore Track Leaderboards</p>
+              <p className="text-sm text-gray-400 mt-1">Pakistan Track Leaderboards</p>
             </div>
             <nav className="flex items-center gap-6">
               <Link
@@ -93,7 +93,13 @@ export default async function HomePage() {
                 href="/tracks/2f2f-formula-karting"
                 className="text-gray-400 hover:text-primary transition-colors font-medium"
               >
-                2F2F
+                2F2F Lahore
+              </Link>
+              <Link
+                href="/tracks/2f2f-formula-karting-islamabad"
+                className="text-gray-400 hover:text-primary transition-colors font-medium"
+              >
+                2F2F Islamabad
               </Link>
             </nav>
           </div>
@@ -108,7 +114,7 @@ export default async function HomePage() {
           </h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
             Comprehensive lap time analysis with tier rankings, percentiles, and competitive insights
-            for Lahore's premier karting tracks.
+            for Pakistan's premier karting tracks.
           </p>
         </div>
 
@@ -205,7 +211,7 @@ export default async function HomePage() {
                 ) : (
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <div className="text-sm text-gray-400 mb-1">World Record</div>
+                      <div className="text-sm text-gray-400 mb-1">Track Record</div>
                       <div className="text-xl font-bold text-accent">{track.stats?.worldRecordStr || 'N/A'}</div>
                       <div className="text-xs text-gray-500 mt-1">{track.stats?.recordHolder || 'Unknown'}</div>
                     </div>
@@ -234,7 +240,7 @@ export default async function HomePage() {
       <footer className="border-t border-surface mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-gray-400 text-sm">
-            <p>Data sourced from RaceFacer • Updated every day at 2PM PKT</p>
+            <p>Data sourced from RaceFacer • Updated every Friday at 4PM PKT</p>
           </div>
         </div>
       </footer>

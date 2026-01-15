@@ -60,7 +60,7 @@ const TRACK_DATA: Record<string, any> = {
     },
   },
   '2f2f-formula-karting': {
-    name: '2F2F Formula Karting',
+    name: '2F2F Formula Karting Lahore',
     location: 'Lahore, Pakistan',
     logo: '/tracks/2f2f-formula-karting.png',
     about: {
@@ -79,6 +79,28 @@ const TRACK_DATA: Record<string, any> = {
               lng: 74.4153437,
               embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1617.0642646972913!2d74.4153437!3d31.540781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39190f1c1e13b4dd%3A0x3640559c8a822e8!2s2F2F%20Formula%20Karting!5e0!3m2!1sen!2s!4v1700000000000",
             },
+    },
+  },
+  '2f2f-formula-karting-islamabad': {
+    name: '2F2F Formula Karting Islamabad',
+    location: 'Islamabad, Pakistan',
+    logo: '/tracks/2f2f-formula-karting-islamabad.png',
+    about: {
+      layoutImage: '/tracks/2f2f-layout.png',
+      description: 'The first location of 2F2F Formula Karting Pakistan, situated in Lake View Park in Islamabad. This track features SR5 karts and provides an exciting karting experience in Pakistan\'s capital city.',
+      details: {
+        length: '1.2km',
+        width: '8-10 meters',
+        corners: 13,
+        surface: 'Asphalt Road',
+        kartType: 'SR5',
+      },
+      videos: ['https://www.youtube.com/embed/cymEdVyg_xk', 'https://www.youtube.com/embed/NDzHrceaDic'],
+      mapLocation: {
+        lat: 33.7199375,
+        lng: 73.1323125,
+        embedUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d408.5761182124575!2d73.1323125!3d33.7199375!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfc101451c4a5d%3A0x74f31dfefb6112da!2s2F2F%20Formula%20Karting!5e0!3m2!1sen!2s!4v1700000000000",
+      },
     },
   },
 };
@@ -118,15 +140,15 @@ export default function AboutTrackPage() {
     fetchTrack();
   }, [slug]);
 
-  // Fetch kart records for tracks with multiple kart types
+  // Fetch kart records for all tracks
   useEffect(() => {
     async function fetchKartRecords() {
-      if (!track || !track.kartTypes || track.kartTypes.length <= 1) {
+      if (!track || !track.kartTypes || track.kartTypes.length === 0) {
         return;
       }
 
       try {
-        // Filter out LR5 for 2F2F track
+        // Filter out LR5 for 2F2F Lahore track
         const kartTypesToShow = slug === '2f2f-formula-karting'
           ? track.kartTypes.filter(kt => kt !== 'LR5')
           : track.kartTypes;
