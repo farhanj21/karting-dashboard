@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Trophy, Users, Clock, TrendingUp, ChevronLeft, Filter } from 'lucide-react';
+import { Trophy, Users, Clock, TrendingUp, ChevronLeft, Filter, Flame, BarChart3, Award } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import SearchBar from '@/components/SearchBar';
 import LeaderboardTable from '@/components/LeaderboardTable';
@@ -12,6 +12,9 @@ import TierDistributionChart from '@/components/TierDistributionChart';
 import TimeDistributionChart from '@/components/TimeDistributionChart';
 import TierBadge from '@/components/TierBadge';
 import KartTypeSelector from '@/components/KartTypeSelector';
+import WarZoneCard from '@/components/track/WarZoneCard';
+import HallOfFameTimeline from '@/components/track/HallOfFameTimeline';
+import DifficultyWallChart from '@/components/track/DifficultyWallChart';
 import { Track, LapRecord, TierDistribution, TimeDistribution } from '@/types';
 import { formatTime, formatGap } from '@/lib/utils';
 
@@ -30,6 +33,12 @@ export default function TrackLeaderboardPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
+
+  // Advanced stats state
+  const [warZoneData, setWarZoneData] = useState<any>(null);
+  const [hallOfFameData, setHallOfFameData] = useState<any[]>([]);
+  const [difficultyWallData, setDifficultyWallData] = useState<any[]>([]);
+  const [advancedStatsLoading, setAdvancedStatsLoading] = useState(false);
 
   // Fetch track data
   useEffect(() => {
@@ -112,6 +121,60 @@ export default function TrackLeaderboardPage() {
 
     fetchStats();
   }, [slug]);
+
+  // Fetch advanced stats (war zone, hall of fame, difficulty wall)
+  useEffect(() => {
+    async function fetchAdvancedStats() {
+      if (!selectedKartType) return;
+
+      setAdvancedStatsLoading(true);
+      try {
+        const kartTypeParam = `?kartType=${selectedKartType}`;
+
+        // Fetch all three endpoints in parallel
+        const [warZoneRes, hallOfFameRes, difficultyWallRes] = await Promise.all([
+          fetch(`/api/tracks/${slug}/war-zone${kartTypeParam}`).catch(() => null),
+          fetch(`/api/tracks/${slug}/hall-of-fame${kartTypeParam}`).catch(() => null),
+          fetch(`/api/tracks/${slug}/difficulty-wall${kartTypeParam}`).catch(() => null),
+        ]);
+
+        // Parse responses
+        const [warZone, hallOfFame, difficultyWall] = await Promise.all([
+          warZoneRes?.json().catch(() => null),
+          hallOfFameRes?.json().catch(() => null),
+          difficultyWallRes?.json().catch(() => null),
+        ]);
+
+        // Update state
+        if (warZone?.success) {
+          setWarZoneData(warZone.warZone);
+        } else {
+          setWarZoneData(null);
+        }
+
+        if (hallOfFame?.success) {
+          setHallOfFameData(hallOfFame.hallOfFame);
+        } else {
+          setHallOfFameData([]);
+        }
+
+        if (difficultyWall?.success) {
+          setDifficultyWallData(difficultyWall.difficultyWall);
+        } else {
+          setDifficultyWallData([]);
+        }
+      } catch (error) {
+        console.error('Error fetching advanced stats:', error);
+        setWarZoneData(null);
+        setHallOfFameData([]);
+        setDifficultyWallData([]);
+      } finally {
+        setAdvancedStatsLoading(false);
+      }
+    }
+
+    fetchAdvancedStats();
+  }, [slug, selectedKartType]);
 
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
@@ -435,6 +498,62 @@ export default function TrackLeaderboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Advanced Stats Sections */}
+        {selectedKartType && (
+          <>
+            {/* War Zone Section */}
+            {warZoneData && !advancedStatsLoading && (
+              <div className="mb-8">
+                <WarZoneCard
+                  timeStart={warZoneData.timeStart}
+                  timeEnd={warZoneData.timeEnd}
+                  driverCount={warZoneData.driverCount}
+                />
+              </div>
+            )}
+
+            {/* Difficulty Wall Chart */}
+            {difficultyWallData.length > 0 && !advancedStatsLoading && (
+              <div className="bg-surface border border-surfaceHover rounded-xl p-6 mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-display font-bold text-white">The Difficulty Wall</h2>
+                </div>
+                <p className="text-sm text-gray-400 mb-6">
+                  Distribution of lap times for {selectedKartType}
+                </p>
+                <DifficultyWallChart
+                  data={difficultyWallData}
+                  warZoneStart={warZoneData?.timeStart}
+                  warZoneEnd={warZoneData?.timeEnd}
+                />
+              </div>
+            )}
+
+            {/* Hall of Fame */}
+            {hallOfFameData.length > 0 && !advancedStatsLoading && (
+              <div className="bg-surface border border-surfaceHover rounded-xl p-6 mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <Award className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-display font-bold text-white">Hall of Fame</h2>
+                </div>
+                <p className="text-sm text-gray-400 mb-6">
+                  World record history for {selectedKartType}
+                </p>
+                <HallOfFameTimeline records={hallOfFameData} />
+              </div>
+            )}
+
+            {/* Loading State for Advanced Stats */}
+            {advancedStatsLoading && (
+              <div className="bg-surface border border-surfaceHover rounded-xl p-12 mb-8 text-center">
+                <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-gray-400">Loading track statistics...</p>
+              </div>
+            )}
+          </>
+        )}
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
