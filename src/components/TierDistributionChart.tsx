@@ -5,6 +5,8 @@ import { TierDistribution } from '@/types';
 
 interface TierDistributionChartProps {
   data: TierDistribution[];
+  onTierClick?: (tier: string) => void;
+  selectedTier?: string;
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -16,14 +18,24 @@ const TIER_COLORS: Record<string, string> = {
   'D': '#ef4444',
 };
 
-export default function TierDistributionChart({ data }: TierDistributionChartProps) {
+export default function TierDistributionChart({ data, onTierClick, selectedTier }: TierDistributionChartProps) {
+  const handleChartClick = (data: any) => {
+    if (data && data.activePayload && data.activePayload.length > 0) {
+      const tier = data.activePayload[0].payload.tier;
+      onTierClick?.(tier);
+    }
+  };
+
   return (
     <div className="bg-surface border border-surfaceHover rounded-lg p-6">
-      <h3 className="text-xl font-display font-bold text-white mb-6">
-        Tier Distribution
-      </h3>
+      <div className="mb-6">
+        <h3 className="text-xl font-display font-bold text-white">
+          Tier Distribution
+        </h3>
+        <p className="text-xs text-gray-500 mt-1">Click on a bar to filter leaderboard</p>
+      </div>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
+        <BarChart data={data} onClick={handleChartClick} barCategoryGap="20%">
           <CartesianGrid strokeDasharray="3 3" stroke="#252525" />
           <XAxis
             dataKey="tier"
@@ -52,16 +64,31 @@ export default function TierDistributionChart({ data }: TierDistributionChartPro
               return [value, name];
             }}
           />
-          <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+          <Bar
+            dataKey="count"
+            radius={[8, 8, 0, 0]}
+            onClick={(data) => onTierClick?.(data.tier)}
+            cursor="pointer"
+          >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={TIER_COLORS[entry.tier] || '#6b7280'} />
+              <Cell
+                key={`cell-${index}`}
+                fill={TIER_COLORS[entry.tier] || '#6b7280'}
+                opacity={selectedTier && selectedTier !== entry.tier ? 0.3 : 1}
+              />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
       <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-2">
         {data.map((item) => (
-          <div key={item.tier} className="flex items-center gap-2 text-sm">
+          <button
+            key={item.tier}
+            onClick={() => onTierClick?.(item.tier)}
+            className={`flex items-center gap-2 text-sm transition-opacity hover:opacity-100 ${
+              selectedTier && selectedTier !== item.tier ? 'opacity-30' : 'opacity-100'
+            }`}
+          >
             <div
               className="w-3 h-3 rounded"
               style={{ backgroundColor: TIER_COLORS[item.tier] }}
@@ -69,7 +96,7 @@ export default function TierDistributionChart({ data }: TierDistributionChartPro
             <span className="text-gray-400">
               {item.tier}: {item.count} ({item.percentage.toFixed(1)}%)
             </span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

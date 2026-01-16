@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Trophy, Users, Clock, TrendingUp, ChevronLeft, Filter, Flame, BarChart3, Award } from 'lucide-react';
+import { Trophy, Users, Clock, TrendingUp, ChevronLeft, Filter, Flame, BarChart3, Award, ExternalLink } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import SearchBar from '@/components/SearchBar';
 import LeaderboardTable from '@/components/LeaderboardTable';
@@ -39,6 +39,9 @@ export default function TrackLeaderboardPage() {
   const [hallOfFameData, setHallOfFameData] = useState<any[]>([]);
   const [difficultyWallData, setDifficultyWallData] = useState<any[]>([]);
   const [advancedStatsLoading, setAdvancedStatsLoading] = useState(false);
+
+  // Ref for scrolling to leaderboard
+  const leaderboardRef = useRef<HTMLDivElement>(null);
 
   // Fetch track data
   useEffect(() => {
@@ -207,6 +210,15 @@ export default function TrackLeaderboardPage() {
       return newTier;
     });
     setPage(1);
+
+    // Scroll to leaderboard with offset for sticky header
+    setTimeout(() => {
+      if (leaderboardRef.current) {
+        const yOffset = -100; // Offset for sticky header
+        const y = leaderboardRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 100);
   }, []);
 
   const handleKartTypeChange = useCallback((kartType: string) => {
@@ -363,7 +375,7 @@ export default function TrackLeaderboardPage() {
         </div>
 
         {/* Leaderboard */}
-        <div className="mb-8">
+        <div ref={leaderboardRef} className="mb-8">
           <h2 className="text-xl md:text-2xl lg:text-3xl font-display font-bold text-white mb-6">
             Leaderboard
             {searchQuery && (
@@ -404,6 +416,15 @@ export default function TrackLeaderboardPage() {
                     <div className="text-xs text-yellow-200 mt-2 font-semibold">
                       Track Record
                     </div>
+                    <a
+                      href={records[0].profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-yellow-200 hover:text-white mt-3 transition-colors"
+                    >
+                      View Profile
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
                 </div>
 
@@ -424,6 +445,15 @@ export default function TrackLeaderboardPage() {
                     <div className="text-xs text-gray-400 mt-2">
                       {formatGap(records[1].gapToP1)}
                     </div>
+                    <a
+                      href={records[1].profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-gray-300 hover:text-white mt-3 transition-colors"
+                    >
+                      View Profile
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
                 </div>
 
@@ -444,6 +474,15 @@ export default function TrackLeaderboardPage() {
                     <div className="text-xs text-gray-400 mt-2">
                       {formatGap(records[2].gapToP1)}
                     </div>
+                    <a
+                      href={records[2].profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-gray-300 hover:text-white mt-3 transition-colors"
+                    >
+                      View Profile
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
                   </div>
                 </div>
               </div>
@@ -578,7 +617,11 @@ export default function TrackLeaderboardPage() {
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <TimeDistributionChart data={timeDistribution} />
-          <TierDistributionChart data={tierDistribution} />
+          <TierDistributionChart
+            data={tierDistribution}
+            onTierClick={handleTierFilter}
+            selectedTier={selectedTier}
+          />
         </div>
       </div>
     </div>
