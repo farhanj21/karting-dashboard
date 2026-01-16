@@ -41,6 +41,12 @@ export default function TierDistributionChart({ data }: TierDistributionChartPro
               borderRadius: '8px',
               color: '#ffffff',
             }}
+            itemStyle={{
+              color: '#ffffff',
+            }}
+            labelStyle={{
+              color: '#ffffff',
+            }}
             formatter={(value: number, name: string) => {
               if (name === 'count') return [value, 'Drivers'];
               return [value, name];
