@@ -522,6 +522,20 @@ export default function TrackLeaderboardPage() {
         {/* Advanced Stats Sections */}
         {selectedKartType && (
           <>
+            {/* Hall of Fame */}
+            {hallOfFameData.length > 0 && !advancedStatsLoading && (
+              <div className="bg-surface border border-surfaceHover rounded-xl p-6 mb-8">
+                <div className="flex items-center gap-2 mb-4">
+                  <Award className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-display font-bold text-white">Hall of Fame</h2>
+                </div>
+                <p className="text-sm text-gray-400 mb-6">
+                  Track record history for {selectedKartType}
+                </p>
+                <HallOfFameTimeline records={hallOfFameData} />
+              </div>
+            )}
+
             {/* War Zone Section */}
             {warZoneData && !advancedStatsLoading && (
               <div className="mb-8">
@@ -548,20 +562,6 @@ export default function TrackLeaderboardPage() {
                   warZoneStart={warZoneData?.timeStart}
                   warZoneEnd={warZoneData?.timeEnd}
                 />
-              </div>
-            )}
-
-            {/* Hall of Fame */}
-            {hallOfFameData.length > 0 && !advancedStatsLoading && (
-              <div className="bg-surface border border-surfaceHover rounded-xl p-6 mb-8">
-                <div className="flex items-center gap-2 mb-4">
-                  <Award className="w-5 h-5 text-primary" />
-                  <h2 className="text-xl font-display font-bold text-white">Hall of Fame</h2>
-                </div>
-                <p className="text-sm text-gray-400 mb-6">
-                  World record history for {selectedKartType}
-                </p>
-                <HallOfFameTimeline records={hallOfFameData} />
               </div>
             )}
 

@@ -46,71 +46,59 @@ export default function DifficultyWallChart({
   };
 
   return (
-    <div className="w-full h-[400px]">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={data}
-          margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-          <XAxis
-            dataKey="timeInSeconds"
-            tickFormatter={formatTime}
-            stroke="#9CA3AF"
-            angle={-45}
-            textAnchor="end"
-            height={80}
-            tick={{ fill: '#9CA3AF', fontSize: 12 }}
-          />
-          <YAxis
-            stroke="#9CA3AF"
-            tick={{ fill: '#9CA3AF', fontSize: 12 }}
-            label={{
-              value: 'Number of Drivers',
-              angle: -90,
-              position: 'insideLeft',
-              style: { fill: '#9CA3AF', fontSize: 14 },
-            }}
-          />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }} />
-          <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={
-                  isInWarZone(entry.timeInSeconds)
-                    ? 'url(#warZoneGradient)'
-                    : 'url(#normalGradient)'
-                }
-              />
-            ))}
-          </Bar>
-          <defs>
-            <linearGradient id="normalGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#6366F1" stopOpacity={0.8} />
-              <stop offset="100%" stopColor="#6366F1" stopOpacity={0.4} />
-            </linearGradient>
-            <linearGradient id="warZoneGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#F97316" stopOpacity={0.9} />
-              <stop offset="100%" stopColor="#EF4444" stopOpacity={0.6} />
-            </linearGradient>
-          </defs>
-        </BarChart>
-      </ResponsiveContainer>
-
-      {/* Legend */}
-      {warZoneStart && warZoneEnd && (
-        <div className="flex items-center justify-center gap-6 mt-4">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-gradient-to-b from-indigo-500 to-indigo-500/40 rounded" />
-            <span className="text-sm text-gray-400">Normal Distribution</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-gradient-to-b from-orange-500 to-red-500/60 rounded" />
-            <span className="text-sm text-gray-400">War Zone</span>
-          </div>
-        </div>
-      )}
+    <div className="w-full">
+      <div className="h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={data}
+            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
+            <XAxis
+              dataKey="timeInSeconds"
+              tickFormatter={formatTime}
+              stroke="#9CA3AF"
+              angle={-45}
+              textAnchor="end"
+              height={80}
+              tick={{ fill: '#9CA3AF', fontSize: 12 }}
+            />
+            <YAxis
+              stroke="#9CA3AF"
+              tick={{ fill: '#9CA3AF', fontSize: 12 }}
+              label={{
+                value: 'Number of Drivers',
+                angle: -90,
+                position: 'insideLeft',
+                style: { fill: '#9CA3AF', fontSize: 14 },
+              }}
+            />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }} />
+            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={
+                    isInWarZone(entry.timeInSeconds)
+                      ? 'url(#warZoneGradient)'
+                      : 'url(#normalGradient)'
+                  }
+                />
+              ))}
+            </Bar>
+            <defs>
+              <linearGradient id="normalGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#6366F1" stopOpacity={0.8} />
+                <stop offset="100%" stopColor="#6366F1" stopOpacity={0.4} />
+              </linearGradient>
+              <linearGradient id="warZoneGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#F97316" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="#EF4444" stopOpacity={0.6} />
+              </linearGradient>
+            </defs>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
